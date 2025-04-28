@@ -1,0 +1,24 @@
+Dropout Ratio Testing Results Summary
+================================
+
+For each dropout ratio, trained AlexNet for 20 epochs on CIFAR-10:
+
+Dropout  Training Acc  Validation Acc
+-------  ------------  --------------
+0.0      89.23%       84.67%
+0.1      87.86%       84.53%
+0.2      87.28%       84.53%
+0.3      86.58%       85.04%
+0.4      86.16%       84.89%
+0.5      85.66%       84.65%
+0.6      85.40%       83.27%
+0.7      85.22%       83.84%
+0.8      84.79%       83.35%
+0.9      81.17%       80.07%
+
+Key Findings:
+1. Best validation accuracy achieved with dropout=0.3 (85.04%)
+2. Training accuracy consistently decreases as dropout ratio increases
+3. Validation accuracy remains relatively stable between 0.0-0.5, then drops off
+4. Large gap between training and validation accuracy with low dropout (0.0-0.2) indicates overfitting
+5. Optimal dropout ratio appears to be between 0.3-0.4 for this model/dataset

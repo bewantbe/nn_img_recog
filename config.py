@@ -3,10 +3,8 @@ import torch
 from pathlib import Path
 
 # Data directories
-if os.name == "nt":
-    BASE_DATA_DIR = Path("E:/code_data/nn_img_recog")
-else:
-    BASE_DATA_DIR = Path("/mnt/data_ext/code_data/nn_img_recog")
+# Get base directory relative to current file location
+BASE_DATA_DIR = Path(__file__).resolve().parent.parent.parent / "code_data" / "nn_img_recog"
 DATASET_DIR = BASE_DATA_DIR / "dataset"
 CHECKPOINT_DIR = BASE_DATA_DIR / "checkpoints"
 

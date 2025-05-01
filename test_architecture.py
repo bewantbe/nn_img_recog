@@ -69,7 +69,7 @@ class ModifiedAlexNet(nn.Module):
                 nn.init.constant_(m.bias, 0)
 
 def train_model(model, train_loader, val_loader, architecture_name, num_epochs=50):
-    writer = SummaryWriter(f'runs/architecture_{architecture_name}')
+    writer = SummaryWriter(f'runs/alex/{architecture_name}/constant_dropout{DROPOUT_RATE}')
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(
         model.parameters(),
@@ -84,7 +84,7 @@ def train_model(model, train_loader, val_loader, architecture_name, num_epochs=5
     val_accs = []
     
     for epoch in range(num_epochs):
-        print(f'\nEpoch: {epoch+1}/{num_epochs} (Architecture: {architecture_name})')
+        print(f'\nEpoch: {epoch+1}/{num_epochs} (AlexNet architecture variation: {architecture_name})')
         epoch_start_time = time.time()
         
         # Train
@@ -136,7 +136,7 @@ def train_model(model, train_loader, val_loader, architecture_name, num_epochs=5
         epoch_end_time = time.time()
         epoch_duration = epoch_end_time - epoch_start_time
         
-        print(f'Architecture: {architecture_name} Epoch: {epoch+1}')
+        print(f'AlexNet architecture variation: {architecture_name} Epoch: {epoch+1}')
         print(f'Training Loss: {train_loss.avg:.4f}, Training Acc: {train_acc.avg:.2f}%')
         print(f'Validation Loss: {val_loss.avg:.4f}, Validation Acc: {val_acc.avg:.2f}%')
         print(f'Epoch Duration: {epoch_duration:.2f} seconds')
@@ -196,7 +196,7 @@ def main():
     for i, conv_config in enumerate(conv_variations):
         for j, fc_sizes in enumerate(fc_variations):
             architecture_name = f"conv{i+1}_fc{j+1}"
-            print(f"\nTesting architecture: {architecture_name}")
+            print(f"\nTesting AlexNet architecture variation: {architecture_name}")
             print("Conv config:", conv_config)
             print("FC sizes:", fc_sizes)
             
@@ -222,7 +222,7 @@ def main():
                 writer.writeheader()
                 writer.writerows(results)
             
-            print(f"\nResults for architecture {architecture_name}:")
+            print(f"\nResults for AlexNet architecture variation {architecture_name}:")
             print(f"Final Training Accuracy: {result['final_train_acc']:.2f}%")
             print(f"Final Validation Accuracy: {result['final_val_acc']:.2f}%")
     

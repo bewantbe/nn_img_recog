@@ -1,6 +1,6 @@
 # This script tests different learning rate scheduling strategies on the performance of an attention-based neural network model using PyTorch.
 
-# run tensorboard by command: tensorboard --logdir=runs_attent
+# run tensorboard by command: tensorboard --logdir=runs
 
 import torch
 import torch.nn as nn
@@ -20,7 +20,8 @@ from torch.optim.lr_scheduler import (
 
 from config import (
     DEVICE, LEARNING_RATE, MOMENTUM, 
-    WEIGHT_DECAY, CHECKPOINT_DIR, NUM_EPOCHS
+    WEIGHT_DECAY, CHECKPOINT_DIR, NUM_EPOCHS,
+    DROPOUT_RATE
 )
 from model_attent import AttentionNet
 from data_loader import get_data_loaders
@@ -51,7 +52,7 @@ def get_scheduler(scheduler_name, optimizer, train_loader_len):
         raise ValueError(f"Unknown scheduler: {scheduler_name}")
 
 def train_model(model, train_loader, val_loader, scheduler_name, num_epochs=NUM_EPOCHS):
-    writer = SummaryWriter(f'runs_attent/scheduler_{scheduler_name}')
+    writer = SummaryWriter(f'runs/alex_attent/v1/{scheduler_name}_dropout{DROPOUT_RATE}')
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(
         model.parameters(),
@@ -70,7 +71,7 @@ def train_model(model, train_loader, val_loader, scheduler_name, num_epochs=NUM_
     learning_rates = []
     
     for epoch in range(num_epochs):
-        print(f'\nEpoch: {epoch+1}/{num_epochs} (Attention Model, Scheduler: {scheduler_name})')
+        print(f'\nEpoch: {epoch+1}/{num_epochs} (AlexNet+Attention v1, Scheduler: {scheduler_name})')
         epoch_start_time = time.time()
         
         # Train
@@ -97,7 +98,7 @@ def train_model(model, train_loader, val_loader, scheduler_name, num_epochs=NUM_
                 scheduler.step()
             
             if i % 100 == 0:
-                print(f'Train: [{i}/{len(train_loader)}]\t'
+                print(f'Train AlexNet+Attention: [{i}/{len(train_loader)}]\t'
                       f'Loss {train_loss.val:.4f} ({train_loss.avg:.4f})\t'
                       f'Acc@1 {train_acc.val:.3f} ({train_acc.avg:.3f})\t'
                       f'LR {optimizer.param_groups[0]["lr"]:.6f}')
@@ -138,7 +139,7 @@ def train_model(model, train_loader, val_loader, scheduler_name, num_epochs=NUM_
         epoch_end_time = time.time()
         epoch_duration = epoch_end_time - epoch_start_time
         
-        print(f'Attention Model - Scheduler: {scheduler_name} Epoch: {epoch+1}')
+        print(f'AlexNet+Attention v1 - Scheduler: {scheduler_name} Epoch: {epoch+1}')
         print(f'Training Loss: {train_loss.avg:.4f}, Training Acc: {train_acc.avg:.2f}%')
         print(f'Validation Loss: {val_loss.avg:.4f}, Validation Acc: {val_acc.avg:.2f}%')
         print(f'Learning Rate: {current_lr:.6f}')
@@ -177,7 +178,7 @@ def main():
     results = []
     
     for scheduler_name in schedulers:
-        print(f"\nTesting attention model with scheduler: {scheduler_name}")
+        print(f"\nTesting AlexNet+Attention v1 with scheduler: {scheduler_name}")
         
         # Create model
         model = AttentionNet().to(DEVICE)
@@ -194,13 +195,13 @@ def main():
         })
         
         # Save current results to CSV
-        with open(results_dir / 'attent_scheduler_results.csv', 'w', newline='') as f:
+        with open(results_dir / 'scheduler_attent_results.csv', 'w', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=['scheduler', 'final_train_acc', 
                                                  'final_val_acc', 'best_val_acc'])
             writer.writeheader()
             writer.writerows(results)
         
-        print(f"\nResults for attention model with scheduler = {scheduler_name}:")
+        print(f"\nResults for AlexNet+Attention v1 with scheduler = {scheduler_name}:")
         print(f"Final Training Accuracy: {result['final_train_acc']:.2f}%")
         print(f"Final Validation Accuracy: {result['final_val_acc']:.2f}%")
         print(f"Best Validation Accuracy: {result['best_val_acc']:.2f}%")
@@ -209,12 +210,12 @@ def main():
         import matplotlib.pyplot as plt
         plt.figure(figsize=(10, 5))
         plt.plot(result['learning_rates'])
-        plt.title(f'Learning Rate Schedule - Attention Model with {scheduler_name}')
+        plt.title(f'Learning Rate Schedule - AlexNet+Attention v1 with {scheduler_name}')
         plt.xlabel('Epoch')
         plt.ylabel('Learning Rate')
         plt.yscale('log')
         plt.grid(True)
-        plt.savefig(results_dir / f'lr_curve_attent_{scheduler_name}.png')
+        plt.savefig(results_dir / f'lr_curve_attent_{scheduler_name}.png')  # No change needed as filename already has attent
         plt.close()
     
     end_time = time.time()

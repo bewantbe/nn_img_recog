@@ -20,7 +20,8 @@ from torch.optim.lr_scheduler import (
 
 from config import (
     DEVICE, LEARNING_RATE, MOMENTUM, 
-    WEIGHT_DECAY, CHECKPOINT_DIR, NUM_EPOCHS
+    WEIGHT_DECAY, CHECKPOINT_DIR, NUM_EPOCHS,
+    DROPOUT_RATE
 )
 from model import AlexNet
 from data_loader import get_data_loaders
@@ -51,7 +52,7 @@ def get_scheduler(scheduler_name, optimizer, train_loader_len):
         raise ValueError(f"Unknown scheduler: {scheduler_name}")
 
 def train_model(model, train_loader, val_loader, scheduler_name, num_epochs=NUM_EPOCHS):
-    writer = SummaryWriter(f'runs/scheduler_{scheduler_name}')
+    writer = SummaryWriter(f'runs/alex/orig/{scheduler_name}_dropout{DROPOUT_RATE}')
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(
         model.parameters(),
@@ -70,7 +71,7 @@ def train_model(model, train_loader, val_loader, scheduler_name, num_epochs=NUM_
     learning_rates = []
     
     for epoch in range(num_epochs):
-        print(f'\nEpoch: {epoch+1}/{num_epochs} (Scheduler: {scheduler_name})')
+        print(f'\nEpoch: {epoch+1}/{num_epochs} (AlexNet original, Scheduler: {scheduler_name})')
         epoch_start_time = time.time()
         
         # Train
@@ -138,7 +139,7 @@ def train_model(model, train_loader, val_loader, scheduler_name, num_epochs=NUM_
         epoch_end_time = time.time()
         epoch_duration = epoch_end_time - epoch_start_time
         
-        print(f'Scheduler: {scheduler_name} Epoch: {epoch+1}')
+        print(f'AlexNet original - Scheduler: {scheduler_name} Epoch: {epoch+1}')
         print(f'Training Loss: {train_loss.avg:.4f}, Training Acc: {train_acc.avg:.2f}%')
         print(f'Validation Loss: {val_loss.avg:.4f}, Validation Acc: {val_acc.avg:.2f}%')
         print(f'Learning Rate: {current_lr:.6f}')
@@ -177,7 +178,7 @@ def main():
     results = []
     
     for scheduler_name in schedulers:
-        print(f"\nTesting scheduler: {scheduler_name}")
+        print(f"\nTesting AlexNet original with scheduler: {scheduler_name}")
         
         # Create model
         model = AlexNet().to(DEVICE)
@@ -200,7 +201,7 @@ def main():
             writer.writeheader()
             writer.writerows(results)
         
-        print(f"\nResults for scheduler = {scheduler_name}:")
+        print(f"\nResults for AlexNet original with scheduler = {scheduler_name}:")
         print(f"Final Training Accuracy: {result['final_train_acc']:.2f}%")
         print(f"Final Validation Accuracy: {result['final_val_acc']:.2f}%")
         print(f"Best Validation Accuracy: {result['best_val_acc']:.2f}%")
@@ -209,7 +210,7 @@ def main():
         import matplotlib.pyplot as plt
         plt.figure(figsize=(10, 5))
         plt.plot(result['learning_rates'])
-        plt.title(f'Learning Rate Schedule - {scheduler_name}')
+        plt.title(f'Learning Rate Schedule - AlexNet original with {scheduler_name}')
         plt.xlabel('Epoch')
         plt.ylabel('Learning Rate')
         plt.yscale('log')
